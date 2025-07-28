@@ -602,7 +602,22 @@
             const remainingInput = parseInt(document.getElementById('remainingInput').value);
             const totalInput = parseInt(document.getElementById('totalInput').value);
             
-            const correctRemaining = blocks.length;
+            // 修正：「10と○で全部で□こ」の○は残りの個別ブロック数ではなく、
+            // もう一つの10のまとまり分も含めた数値
+            const tenGroupsCount = tenGroups.length;
+            const remainingBlocks = blocks.length;
+            
+            // 20個の場合: 10のまとまり2つ = 「10と10で全部で20こ」
+            // 19個の場合: 10のまとまり1つ + 残り9個 = 「10と9で全部で19こ」
+            let correctRemaining;
+            if (tenGroupsCount === 2 && remainingBlocks === 0) {
+                // 10のまとまりが2つある場合（20個の問題）
+                correctRemaining = 10;
+            } else {
+                // 10のまとまりが1つ + 残りのブロック
+                correctRemaining = remainingBlocks;
+            }
+            
             const correctTotal = currentTotal;
             
             const resultDiv = document.getElementById('result');
@@ -625,14 +640,7 @@
                     }, 2000);
                 }
             } else {
-                let message = '❌ まちがいです。もういちどかんがえてみよう。\n';
-                if (remainingInput !== correctRemaining) {
-                    message += `のこりのブロックは${correctRemaining}こです。\n`;
-                }
-                if (totalInput !== correctTotal) {
-                    message += `ぜんぶで${correctTotal}こです。`;
-                }
-                resultDiv.textContent = message;
+                resultDiv.textContent = '❌ まちがいです。もういちどかんがえてみよう。';
                 resultDiv.className = 'result incorrect';
             }
         }
