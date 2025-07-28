@@ -35,27 +35,6 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .problem-area {
-            padding: 20px;
-            text-align: center;
-            background: #f9f9f9;
-            border-bottom: 3px solid #e0e0e0;
-        }
-
-        .problem-text {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #2e7d32;
-            margin-bottom: 15px;
-        }
-
-        .total-blocks {
-            font-size: 2em;
-            color: #1976d2;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
         .controls {
             display: flex;
             justify-content: center;
@@ -198,34 +177,6 @@
             color: #1976d2;
         }
 
-        .status-info {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 15px;
-            background: #ffffff;
-            border-bottom: 2px solid #e0e0e0;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .status-item {
-            text-align: center;
-            min-width: 100px;
-        }
-
-        .status-label {
-            font-size: 1em;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .status-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #2196f3;
-        }
-
         .celebration {
             position: absolute;
             top: 50%;
@@ -248,6 +199,96 @@
             0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
             50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
             100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 15px;
+            background: #f0f8ff;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2196f3;
+        }
+
+        .clear-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .clear-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .clear-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: clearPop 0.5s ease-out;
+        }
+
+        @keyframes clearPop {
+            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .clear-content h2 {
+            color: #4caf50;
+            font-size: 2.5em;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .clear-content p {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
         }
 
         @media (max-width: 768px) {
@@ -274,19 +315,10 @@
             <p>ブロックをまるでかこんで10のまとまりをつくろう！</p>
         </div>
 
-        <div class="problem-area">
-            <div class="problem-text">ブロックは ぜんぶで なんこ？</div>
-            <div id="totalBlocks" class="total-blocks">？こ</div>
-        </div>
-
-        <div class="status-info">
-            <div class="status-item">
-                <div class="status-label">1のブロック</div>
-                <div id="singleBlocks" class="status-value">0</div>
-            </div>
-            <div class="status-item">
-                <div class="status-label">10のまとまり</div>
-                <div id="tenGroups" class="status-value">0</div>
+        <div class="score-display">
+            <div>せいかいした もんだい: <span id="correctCount">0</span> / 5</div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill" style="width: 0%"></div>
             </div>
         </div>
 
@@ -327,6 +359,14 @@
         </div>
     </div>
 
+    <div id="clearMessage" class="clear-message">
+        <div class="clear-content">
+            <h2>🎉 クリア！ 🎉</h2>
+            <p>5もんだい ぜんぶ せいかい！<br>とても よく できました！</p>
+            <button id="restartBtn" class="restart-btn">もういちど あそぶ</button>
+        </div>
+    </div>
+
     <script>
         // キャンバスとコンテキストの取得
         const canvas = document.getElementById('gameCanvas');
@@ -342,6 +382,8 @@
         let isDragging = false;
         let dragTarget = null;
         let dragOffset = { x: 0, y: 0 };
+        let correctAnswers = 0;
+        let gameCleared = false;
         
         // ブロックのサイズと色設定
         const BLOCK_SIZE = 30;
@@ -492,8 +534,6 @@
                 blocks.push(new Block(x, y));
             }
             
-            // UIを更新
-            updateUI();
             clearAnswers();
             clearResult();
         }
@@ -553,11 +593,12 @@
             // 10のまとまりを作成
             const tenGroup = new TenGroup(groupX, groupY);
             tenGroups.push(tenGroup);
-            updateUI();
         }
 
         // 答えをチェック
         function checkAnswer() {
+            if (gameCleared) return;
+            
             const remainingInput = parseInt(document.getElementById('remainingInput').value);
             const totalInput = parseInt(document.getElementById('totalInput').value);
             
@@ -567,9 +608,22 @@
             const resultDiv = document.getElementById('result');
             
             if (remainingInput === correctRemaining && totalInput === correctTotal) {
+                correctAnswers++;
+                updateScore();
+                
                 resultDiv.textContent = '🎉 せいかい！ よくできました！ 🎉';
                 resultDiv.className = 'result correct';
                 showCelebration('せいかい！');
+                
+                if (correctAnswers >= 5) {
+                    setTimeout(() => {
+                        showClearMessage();
+                    }, 2000);
+                } else {
+                    setTimeout(() => {
+                        generateNewProblem();
+                    }, 2000);
+                }
             } else {
                 let message = '❌ まちがいです。もういちどかんがえてみよう。\n';
                 if (remainingInput !== correctRemaining) {
@@ -583,11 +637,26 @@
             }
         }
 
-        // UIを更新
-        function updateUI() {
-            document.getElementById('singleBlocks').textContent = blocks.length;
-            document.getElementById('tenGroups').textContent = tenGroups.length;
-            document.getElementById('totalBlocks').textContent = currentTotal + 'こ';
+        // スコアを更新
+        function updateScore() {
+            document.getElementById('correctCount').textContent = correctAnswers;
+            const progressPercent = (correctAnswers / 5) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+        }
+
+        // クリアメッセージを表示
+        function showClearMessage() {
+            gameCleared = true;
+            document.getElementById('clearMessage').classList.add('show');
+        }
+
+        // ゲームをリスタート
+        function restartGame() {
+            correctAnswers = 0;
+            gameCleared = false;
+            updateScore();
+            document.getElementById('clearMessage').classList.remove('show');
+            generateNewProblem();
         }
 
         // 答えをクリア
@@ -725,6 +794,7 @@
         document.getElementById('groupBtn').addEventListener('click', () => setMode('group'));
         document.getElementById('newProblemBtn').addEventListener('click', generateNewProblem);
         document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+        document.getElementById('restartBtn').addEventListener('click', restartGame);
 
         // Enterキーでも答え合わせができるように
         document.getElementById('remainingInput').addEventListener('keypress', function(e) {
@@ -776,6 +846,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
         setMode('group'); // 初期モードを設定
+        updateScore(); // 初期スコア表示
         generateNewProblem();
         gameLoop();
 
